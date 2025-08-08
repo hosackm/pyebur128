@@ -1,9 +1,13 @@
-from pathlib import Path
-import soundfile as sf
-from cffi import FFI
+import platform
 
+from pathlib import Path
 from typing import Protocol, cast
 
+import soundfile as sf
+
+from cffi import FFI
+
+EXTENSION = {"Darwin": ".dylib", "Linux": ".so", "Windows": ".dll"}[platform.system()]
 HERE = Path(__file__).parent
 
 
@@ -26,7 +30,7 @@ int ebur128_loudness_global(ebur128_state* st, double* out);
 """)
 
 
-lib = cast(LibEbur128, ffi.dlopen(str(HERE / "libebur128.dylib")))
+lib = cast(LibEbur128, ffi.dlopen(str(HERE / f"libebur128{EXTENSION}")))
 
 
 def compute_loudness_streaming(filepath: str, blocksize: int = 4096) -> float:
