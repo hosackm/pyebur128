@@ -1,12 +1,17 @@
+import site
 import platform
+
 from pathlib import Path
 from typing import Protocol, cast
+
 
 import soundfile as sf
 from cffi import FFI
 
 EXTENSION = {"Darwin": ".dylib", "Linux": ".so", "Windows": ".dll"}[platform.system()]
 HERE = Path(__file__).parent
+
+__all__ = ["Meter"]
 
 
 class LibEbur128(Protocol):
@@ -17,7 +22,7 @@ class LibEbur128(Protocol):
 
 
 class Meter:
-    def __init__(self, lib_path: Path | None = None):
+    def __init__(self):
         self.ffi = FFI()
         self.ffi.cdef("""
         typedef struct ebur128_state ebur128_state;
@@ -28,9 +33,9 @@ class Meter:
         int ebur128_loudness_global(ebur128_state* st, double* out);
         """)
 
-        if lib_path is None:
-            lib_path = HERE / f"libebur128{EXTENSION}"
-        self.lib = cast(LibEbur128, self.ffi.dlopen(str(lib_path)))
+        site_packages = Path(site.getsitepackages()[0])
+        lib_path = Path("pyebur128", f"libebur128{EXTENSION}")
+        self.lib = cast(LibEbur128, self.ffi.dlopen(str(site_packages / lib_path)))
 
     def measure(self, filepath: str, blocksize: int = 4096) -> float:
         """Compute integrated loudness (LUFS) of the given audio file using streaming."""

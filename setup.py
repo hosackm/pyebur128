@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 from setuptools.command.build_py import build_py
 from setuptools.errors import SetupError
 
@@ -52,8 +52,8 @@ class CMakeBuild(build_py):
 setup(
     name="pyebur128",
     version="0.1.0",
-    packages=["pyebur128"],
+    packages=find_packages(".", exclude=["tests", "tests.*"]),
     cmdclass={"build_py": CMakeBuild},
     include_package_data=True,
-    package_data={"pyebur128": ["libebur128.dylib"]},
+    package_data={"pyebur128": ["libebur128.*"]},
 )
