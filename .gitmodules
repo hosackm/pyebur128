@@ -1,0 +1,3 @@
+[submodule "external/libebur128"]
+	path = external/libebur128
+	url = https://github.com/hosackm/libebur128
