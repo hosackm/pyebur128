@@ -1,4 +1,4 @@
-from setuptools import Extension, setup
+from setuptools import setup
 from setuptools.command.build_py import build_py
 from setuptools.errors import SetupError
 
@@ -7,10 +7,14 @@ import shutil
 import subprocess
 import platform
 
+if not os.path.exists("external/libebur128"):
+    raise SetupError(
+        "Couldn't find external/libebur128. Run: git submodule update --init --recursive"
+    )
+
 
 class CMakeBuild(build_py):
     def run(self):
-        self.extensions = []
         super().run()
 
         build_dir = os.path.abspath("build")
@@ -43,9 +47,6 @@ class CMakeBuild(build_py):
 
         os.makedirs(os.path.dirname(libdst), exist_ok=True)
         shutil.copyfile(libsrc, libdst)
-
-    def build_extensions(self):
-        return
 
 
 setup(
