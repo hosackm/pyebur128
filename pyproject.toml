@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyebur128"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python wrapper for libebur128 with streaming support"
 authors = [
   { name = "Matt Hosack", email = "hosack.matt@gmail.com" }
