@@ -32,10 +32,8 @@ class Meter:
         int ebur128_add_frames_float(ebur128_state* st, const float* frames, size_t frames_size);
         int ebur128_loudness_global(ebur128_state* st, double* out);
         """)
-
-        site_packages = Path(site.getsitepackages()[0])
-        lib_path = Path("pyebur128", f"libebur128{EXTENSION}")
-        self.lib = cast(LibEbur128, self.ffi.dlopen(str(site_packages / lib_path)))
+        lib_path = Path(HERE, "lib", f"libebur128{EXTENSION}")
+        self.lib = cast(LibEbur128, self.ffi.dlopen(str(lib_path)))
 
     def measure(self, filepath: str, blocksize: int = 4096) -> float:
         """Compute integrated loudness (LUFS) of the given audio file using streaming."""
