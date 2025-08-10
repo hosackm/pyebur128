@@ -5,7 +5,7 @@ set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 
 set(PY_IMPORT_NAME pyebur128)
 
-add_subdirectory(external/libebur128)
+add_subdirectory(extern/libebur128)
 
 message(INFO "Running your CMAKE")
 
