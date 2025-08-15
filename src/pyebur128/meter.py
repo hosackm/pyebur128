@@ -1,39 +1,12 @@
-import site
-import platform
-
-from pathlib import Path
-from typing import Protocol, cast
-
-
+from ._ffi import build_ffi_and_lib
 import soundfile as sf
-from cffi import FFI
-
-EXTENSION = {"Darwin": ".dylib", "Linux": ".so", "Windows": ".dll"}[platform.system()]
-HERE = Path(__file__).parent
 
 __all__ = ["Meter"]
 
 
-class LibEbur128(Protocol):
-    def ebur128_init(self, channels: int, samplerate: int, mode: int): ...
-    def ebur128_destroy(self, state_ptr): ...
-    def ebur128_add_frames_float(self, state, frames, frames_size: int) -> int: ...
-    def ebur128_loudness_global(self, state, out_ptr) -> int: ...
-
-
 class Meter:
     def __init__(self):
-        self.ffi = FFI()
-        self.ffi.cdef("""
-        typedef struct ebur128_state ebur128_state;
-
-        ebur128_state* ebur128_init(unsigned int channels, unsigned long samplerate, unsigned int mode);
-        void ebur128_destroy(ebur128_state** st);
-        int ebur128_add_frames_float(ebur128_state* st, const float* frames, size_t frames_size);
-        int ebur128_loudness_global(ebur128_state* st, double* out);
-        """)
-        lib_path = Path(HERE, "lib", f"libebur128{EXTENSION}")
-        self.lib = cast(LibEbur128, self.ffi.dlopen(str(lib_path)))
+        self.ffi, self.lib = build_ffi_and_lib()
 
     def measure(self, filepath: str, blocksize: int = 4096) -> float:
         """Compute integrated loudness (LUFS) of the given audio file using streaming."""
