@@ -21,7 +21,7 @@ class Meter:
 
             try:
                 while True:
-                    block = f.read(blocksize, always_2d=True)
+                    block = f.read(blocksize, always_2d=True, dtype="float32")
                     if len(block) == 0:
                         break
 
