@@ -3,53 +3,65 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"   # e.g. v1.2.3
+      - "v*.*.*"
 
 jobs:
-  build-and-publish:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.11"]
-
+  build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.13"
 
-      # Needed for building wheels with scikit-build
       - name: Install build tools
         run: |
           python -m pip install --upgrade pip
-          pip install build scikit-build cmake ninja setuptools wheel # twine
+          pip install build scikit-build cmake ninja setuptools wheel
 
-      - name: Build wheels and sdist
+      - name: Build package
         run: python -m build
 
-      - name: Upload dist artifacts
+      - name: Upload dist as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ matrix.os }}
+          name: dist
           path: dist/*
 
-  publish-pypi:
-    needs: build-and-publish
+  release:
+    needs: build
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write   # needed to create releases
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+
+      - name: Download built dist
+        uses: actions/download-artifact@v4
         with:
-          name: dist-ubuntu-latest
+          name: dist
           path: dist/
 
-      # - name: Publish to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     user: __token__
-      #     password: ${{ secrets.PYPI_API_TOKEN }}
-      #
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+
+# publish-pypi:
+#   needs: build-and-publish
+#   runs-on: ubuntu-latest
+#
+#   steps:
+#     - uses: actions/download-artifact@v4
+#       with:
+#         name: dist-ubuntu-latest
+#         path: dist/
+#
+#     - name: Publish to PyPI
+#       uses: pypa/gh-action-pypi-publish@release/v1
+#       with:
+#         user: __token__
+#         password: ${{ secrets.PYPI_API_TOKEN }}
 

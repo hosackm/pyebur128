@@ -2,9 +2,25 @@ name: CI – Build & Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - "**"
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "setup.py"
+      - "requirements.txt"
+      - ".github/workflows/**"
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - "**"
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "setup.py"
+      - "requirements.txt"
+      - ".github/workflows/**"
 
 jobs:
   ci:
